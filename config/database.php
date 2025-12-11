@@ -113,6 +113,22 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        // Drupal database connection for data import
+        'drupal' => [
+            'driver' => 'mysql',
+            'host' => env('DRUPAL_DB_HOST', '127.0.0.1'),
+            'port' => env('DRUPAL_DB_PORT', '3306'),
+            'database' => env('DRUPAL_DB_DATABASE', 'esxatos'),
+            'username' => env('DRUPAL_DB_USERNAME', 'esxatos'),
+            'password' => env('DRUPAL_DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
     ],
 
     /*
