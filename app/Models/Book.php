@@ -24,6 +24,8 @@ class Book extends Model
         'is_published',
         'views_count',
         'downloads_count',
+        'rating_average',
+        'rating_count',
         'published_at',
     ];
 
@@ -50,6 +52,21 @@ class Book extends Model
     public function files(): HasMany
     {
         return $this->hasMany(BookFile::class)->orderBy('sort_order');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class)->approved()->roots()->orderBy('created_at', 'desc');
+    }
+
+    public function allComments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
     }
 
     public function getUrlAttribute(): string
@@ -88,5 +105,19 @@ class Book extends Model
     public function incrementViews(): void
     {
         $this->increment('views_count');
+    }
+
+    public function updateRatingStats(): void
+    {
+        $this->update([
+            'rating_average' => $this->ratings()->avg('value') ?? 0,
+            'rating_count' => $this->ratings()->count(),
+        ]);
+    }
+
+    public function getRatingStarsAttribute(): float
+    {
+        // Convert 0-100 scale to 0-5 stars
+        return round($this->rating_average / 20, 1);
     }
 }

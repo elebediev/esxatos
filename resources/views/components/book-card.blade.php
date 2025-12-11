@@ -3,7 +3,7 @@
 <article class="book-card card">
     <a href="{{ route('book.show', $book->slug) }}" class="book-card-cover">
         @if($book->cover_image)
-            <img src="https://esxatos.com/sites/default/files/{{ $book->cover_image }}"
+            <img src="{{ asset('storage/uploads/' . $book->cover_image) }}"
                  alt="{{ $book->cover_alt ?? $book->title }}"
                  loading="lazy">
         @else

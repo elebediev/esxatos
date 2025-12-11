@@ -26,18 +26,33 @@ class ImportAllCommand extends Command
         }
 
         // Step 1: Import users
-        $this->info('Step 1/3: Importing users...');
+        $this->info('Step 1/6: Importing users...');
         $this->call('import:users');
         $this->newLine();
 
         // Step 2: Import categories
-        $this->info('Step 2/3: Importing categories...');
+        $this->info('Step 2/6: Importing categories...');
         $this->call('import:categories');
         $this->newLine();
 
         // Step 3: Import books
-        $this->info('Step 3/3: Importing books...');
+        $this->info('Step 3/6: Importing books...');
         $this->call('import:books');
+        $this->newLine();
+
+        // Step 4: Import comments
+        $this->info('Step 4/6: Importing comments...');
+        $this->call('import:comments');
+        $this->newLine();
+
+        // Step 5: Import ratings
+        $this->info('Step 5/6: Importing ratings...');
+        $this->call('import:ratings');
+        $this->newLine();
+
+        // Step 6: Import private messages
+        $this->info('Step 6/6: Importing private messages...');
+        $this->call('import:messages');
         $this->newLine();
 
         $this->info('=== Import completed! ===');
@@ -50,6 +65,10 @@ class ImportAllCommand extends Command
                 ['Categories', \App\Models\Category::count()],
                 ['Books', \App\Models\Book::count()],
                 ['Book Files', \App\Models\BookFile::count()],
+                ['Comments', \App\Models\Comment::count()],
+                ['Ratings', \App\Models\Rating::count()],
+                ['Message Threads', \App\Models\MessageThread::count()],
+                ['Messages', \App\Models\Message::count()],
                 ['URL Redirects', \App\Models\UrlRedirect::count()],
             ]
         );

@@ -7,7 +7,7 @@
     <meta property="og:title" content="{{ $book->title }}">
     <meta property="og:description" content="{{ Str::limit(strip_tags($book->description), 160) }}">
     @if($book->cover_image)
-        <meta property="og:image" content="https://esxatos.com/sites/default/files/{{ $book->cover_image }}">
+        <meta property="og:image" content="{{ asset('storage/uploads/' . $book->cover_image) }}">
     @endif
     <meta property="og:type" content="book">
 @endsection
@@ -17,7 +17,7 @@
         <div class="book-main">
             <div class="book-cover-wrapper">
                 @if($book->cover_image)
-                    <img src="https://esxatos.com/sites/default/files/{{ $book->cover_image }}"
+                    <img src="{{ asset('storage/uploads/' . $book->cover_image) }}"
                          alt="{{ $book->cover_alt ?? $book->title }}"
                          class="book-cover">
                 @else
