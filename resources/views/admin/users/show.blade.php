@@ -125,6 +125,52 @@
             </div>
         </div>
 
+        {{-- Login History --}}
+        <div class="detail-card detail-card-full">
+            <h2 class="card-title">История входов (последние 20)</h2>
+            @if($loginLogs->count() > 0)
+                <div class="login-logs-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Дата/время</th>
+                                <th>IP-адрес</th>
+                                <th>Устройство</th>
+                                <th>Браузер</th>
+                                <th>ОС</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($loginLogs as $log)
+                                <tr>
+                                    <td>{{ $log->logged_in_at->format('d.m.Y H:i') }}</td>
+                                    <td>
+                                        <code class="ip-address">{{ $log->ip_address }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="device-badge device-{{ $log->device_type }}">
+                                            @if($log->device_type === 'mobile')
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                            @elseif($log->device_type === 'tablet')
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                            @else
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                            @endif
+                                            {{ ucfirst($log->device_type ?? 'desktop') }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $log->browser ?? '—' }}{{ $log->browser_version ? ' ' . $log->browser_version : '' }}</td>
+                                    <td>{{ $log->platform ?? '—' }}{{ $log->platform_version ? ' ' . $log->platform_version : '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="no-data">Нет записей о входах</p>
+            @endif
+        </div>
+
         {{-- Actions --}}
         <div class="user-actions">
             <a href="{{ route('messages.create', ['to' => $user->id]) }}" class="action-btn action-btn-primary">
@@ -299,6 +345,68 @@
         }
     }
 
+    .detail-card-full {
+        grid-column: 1 / -1;
+    }
+
+    .login-logs-table {
+        overflow-x: auto;
+    }
+
+    .login-logs-table table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .login-logs-table th,
+    .login-logs-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .login-logs-table th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--bg-secondary);
+    }
+
+    .login-logs-table tr:hover {
+        background: var(--bg-secondary);
+    }
+
+    .ip-address {
+        font-family: monospace;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        background: var(--bg-secondary);
+        border-radius: 4px;
+        color: var(--text-main);
+    }
+
+    .device-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .device-desktop { background: #dbeafe; color: #1e40af; }
+    .device-mobile { background: #d1fae5; color: #065f46; }
+    .device-tablet { background: #fef3c7; color: #92400e; }
+
+    .no-data {
+        color: var(--text-muted);
+        text-align: center;
+        padding: 2rem;
+    }
+
     @media (max-width: 768px) {
         .info-item {
             flex-direction: column;
@@ -309,6 +417,11 @@
         }
         .stats-grid {
             grid-template-columns: 1fr;
+        }
+        .login-logs-table th,
+        .login-logs-table td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
         }
     }
 </style>

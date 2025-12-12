@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Book::class);
     }
+
+    public function loginLogs(): HasMany
+    {
+        return $this->hasMany(UserLoginLog::class)->orderBy('logged_in_at', 'desc');
+    }
 }

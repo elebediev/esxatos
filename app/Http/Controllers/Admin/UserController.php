@@ -46,6 +46,9 @@ class UserController extends Controller
         // Get user's uploaded books count
         $booksCount = $user->books()->count();
 
-        return view('admin.users.show', compact('user', 'messageThreadsCount', 'booksCount'));
+        // Get recent login logs
+        $loginLogs = $user->loginLogs()->limit(20)->get();
+
+        return view('admin.users.show', compact('user', 'messageThreadsCount', 'booksCount', 'loginLogs'));
     }
 }
