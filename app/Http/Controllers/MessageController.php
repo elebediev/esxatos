@@ -80,7 +80,7 @@ class MessageController extends Controller
         // Add participants
         $thread->participants()->attach([
             Auth::id() => ['is_read' => true, 'last_read_at' => now()],
-            $recipient->id => ['is_read' => false],
+            $recipient->id => ['is_read' => false, 'last_read_at' => null],
         ]);
 
         // Create message

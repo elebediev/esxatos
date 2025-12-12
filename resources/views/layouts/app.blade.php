@@ -381,6 +381,27 @@
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
         });
+
+        // Auto-detect timezone for authenticated users
+        @auth
+            @if(empty(auth()->user()->timezone))
+            (function() {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if (tz && !localStorage.getItem('tz_sent')) {
+                    fetch('{{ route('profile.timezone') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ timezone: tz })
+                    }).then(() => {
+                        localStorage.setItem('tz_sent', '1');
+                    }).catch(() => {});
+                }
+            })();
+            @endif
+        @endauth
     </script>
 
     @stack('scripts')

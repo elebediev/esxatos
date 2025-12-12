@@ -70,6 +70,50 @@
                     @endif
                 </div>
 
+                <div class="form-group">
+                    <label for="timezone" class="form-label">Часовой пояс</label>
+                    <select id="timezone" name="timezone" class="form-input form-select @error('timezone') error @enderror">
+                        @php
+                            $currentTz = old('timezone', $user->timezone ?? 'Europe/Kyiv');
+                            $timezones = [
+                                'Europe/Kyiv' => 'Киев (UTC+2/+3)',
+                                'Europe/Moscow' => 'Москва (UTC+3)',
+                                'Europe/Minsk' => 'Минск (UTC+3)',
+                                'Europe/Kaliningrad' => 'Калининград (UTC+2)',
+                                'Europe/Samara' => 'Самара (UTC+4)',
+                                'Asia/Yekaterinburg' => 'Екатеринбург (UTC+5)',
+                                'Asia/Omsk' => 'Омск (UTC+6)',
+                                'Asia/Krasnoyarsk' => 'Красноярск (UTC+7)',
+                                'Asia/Irkutsk' => 'Иркутск (UTC+8)',
+                                'Asia/Yakutsk' => 'Якутск (UTC+9)',
+                                'Asia/Vladivostok' => 'Владивосток (UTC+10)',
+                                'Asia/Magadan' => 'Магадан (UTC+11)',
+                                'Asia/Kamchatka' => 'Камчатка (UTC+12)',
+                                'Asia/Almaty' => 'Алматы (UTC+6)',
+                                'Asia/Tashkent' => 'Ташкент (UTC+5)',
+                                'Asia/Tbilisi' => 'Тбилиси (UTC+4)',
+                                'Asia/Baku' => 'Баку (UTC+4)',
+                                'Europe/Chisinau' => 'Кишинёв (UTC+2/+3)',
+                                'Europe/Riga' => 'Рига (UTC+2/+3)',
+                                'Europe/Vilnius' => 'Вильнюс (UTC+2/+3)',
+                                'Europe/Tallinn' => 'Таллин (UTC+2/+3)',
+                                'Europe/Warsaw' => 'Варшава (UTC+1/+2)',
+                                'Europe/Berlin' => 'Берлин (UTC+1/+2)',
+                                'Europe/London' => 'Лондон (UTC+0/+1)',
+                                'America/New_York' => 'Нью-Йорк (UTC-5/-4)',
+                                'America/Los_Angeles' => 'Лос-Анджелес (UTC-8/-7)',
+                                'UTC' => 'UTC',
+                            ];
+                        @endphp
+                        @foreach($timezones as $tz => $label)
+                            <option value="{{ $tz }}" {{ $currentTz === $tz ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('timezone')
+                        <div class="form-error">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Сохранить</button>
                     @if (session('status') === 'profile-updated')
@@ -178,6 +222,7 @@
     .form-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; background: var(--bg-card); color: var(--text-main); transition: border-color 0.2s, box-shadow 0.2s; }
     .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
     .form-input.error { border-color: #ef4444; }
+    .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
     .form-error { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; }
 
     .form-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }

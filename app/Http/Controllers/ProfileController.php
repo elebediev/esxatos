@@ -38,6 +38,26 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update timezone automatically (AJAX).
+     */
+    public function updateTimezone(Request $request)
+    {
+        $request->validate([
+            'timezone' => ['required', 'string', 'timezone:all'],
+        ]);
+
+        $user = $request->user();
+
+        // Only update if user hasn't set timezone manually
+        if (empty($user->timezone)) {
+            $user->timezone = $request->timezone;
+            $user->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

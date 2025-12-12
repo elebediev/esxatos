@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MessageThread;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -33,5 +34,18 @@ class UserController extends Controller
         $users = $query->orderBy('created_at', 'desc')->paginate(30)->withQueryString();
 
         return view('admin.users.index', compact('users'));
+    }
+
+    public function show(User $user)
+    {
+        $user->load('roles');
+
+        // Get user's message threads count
+        $messageThreadsCount = MessageThread::whereHas('participants', fn($q) => $q->where('user_id', $user->id))->count();
+
+        // Get user's uploaded books count
+        $booksCount = $user->books()->count();
+
+        return view('admin.users.show', compact('user', 'messageThreadsCount', 'booksCount'));
     }
 }

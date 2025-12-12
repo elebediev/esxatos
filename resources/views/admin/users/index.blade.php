@@ -59,7 +59,7 @@
                         <td>{{ $user->id }}</td>
                         <td>
                             <div class="user-name">
-                                {{ $user->name }}
+                                <a href="{{ route('admin.users.show', $user) }}" class="user-name-link">{{ $user->name }}</a>
                                 @if($user->drupal_uid)
                                     <span class="drupal-badge" title="Drupal UID: {{ $user->drupal_uid }}">D</span>
                                 @endif
@@ -232,6 +232,8 @@
     }
 
     .user-name { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
+    .user-name-link { color: var(--text-main); transition: color 0.2s; }
+    .user-name-link:hover { color: var(--primary); }
     .drupal-badge {
         display: inline-flex;
         align-items: center;
