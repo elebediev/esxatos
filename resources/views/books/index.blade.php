@@ -1,39 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Библиотека - Esxatos')
+@section('title', 'Книги - Esxatos')
 @section('description', 'Полный каталог книг богословской библиотеки Esxatos. Книги по библеистике, богословию, истории церкви.')
 
 @section('content')
-    <div class="books-page">
-        <div class="books-sidebar">
-            <h2>Категории</h2>
-            <nav class="sidebar-categories">
-                <a href="{{ route('books.index') }}" class="{{ !request('category') ? 'active' : '' }}">
-                    Все книги
-                </a>
-                @foreach($categories as $category)
-                    <a href="{{ route('books.index', ['category' => $category->slug]) }}"
-                       class="{{ request('category') == $category->slug ? 'active' : '' }}">
-                        {{ $category->name }}
-                        <span>({{ $category->books_count }})</span>
-                    </a>
-                @endforeach
-            </nav>
-        </div>
-
-        <div class="books-content">
-            <div class="books-header">
-                <h1 class="page-title">Библиотека</h1>
-                <div class="books-sort">
-                    <span>Сортировка:</span>
-                    <a href="{{ route('books.index', array_merge(request()->except('sort'), ['sort' => 'newest'])) }}"
-                       class="{{ $sort == 'newest' ? 'active' : '' }}">Новые</a>
-                    <a href="{{ route('books.index', array_merge(request()->except('sort'), ['sort' => 'popular'])) }}"
-                       class="{{ $sort == 'popular' ? 'active' : '' }}">Популярные</a>
-                    <a href="{{ route('books.index', array_merge(request()->except('sort'), ['sort' => 'title'])) }}"
-                       class="{{ $sort == 'title' ? 'active' : '' }}">По названию</a>
-                </div>
+    <div class="catalog-page">
+        {{-- Sidebar --}}
+        <aside class="catalog-sidebar">
+            {{-- Categories Section --}}
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Категории</h3>
+                <nav class="sidebar-nav">
+                    @foreach($categories as $category)
+                        <a href="{{ route('books.index', ['category' => $category->slug]) }}"
+                           class="sidebar-link {{ request('category') == $category->slug ? 'active' : '' }}">
+                            <span class="sidebar-link-name">{{ $category->name }}</span>
+                            <span class="sidebar-link-count">{{ $category->books_count }}</span>
+                        </a>
+                    @endforeach
+                </nav>
             </div>
+        </aside>
+
+        {{-- Main Content --}}
+        <main class="catalog-content">
+            <h1 class="catalog-title">Книги</h1>
 
             @if($books->isEmpty())
                 <div class="empty-state">
@@ -42,139 +33,258 @@
             @else
                 <div class="books-grid">
                     @foreach($books as $book)
-                        @include('components.book-card', ['book' => $book])
+                        @include('components.book-card-modern', ['book' => $book])
                     @endforeach
                 </div>
 
-                {{ $books->links('pagination.simple') }}
+                {{-- Pagination --}}
+                @if($books->hasPages())
+                    <nav class="pagination-wrapper">
+                        <div class="pagination">
+                            {{-- Previous --}}
+                            @if($books->onFirstPage())
+                                <span class="pagination-link disabled">Назад</span>
+                            @else
+                                <a href="{{ $books->previousPageUrl() }}" class="pagination-link">Назад</a>
+                            @endif
+
+                            {{-- Page Numbers --}}
+                            @php
+                                $currentPage = $books->currentPage();
+                                $lastPage = $books->lastPage();
+                            @endphp
+
+                            @for($i = 1; $i <= min(3, $lastPage); $i++)
+                                <a href="{{ $books->url($i) }}"
+                                   class="pagination-link {{ $currentPage == $i ? 'active' : '' }}">{{ $i }}</a>
+                            @endfor
+
+                            @if($lastPage > 4)
+                                <span class="pagination-ellipsis">...</span>
+                                <a href="{{ $books->url($lastPage) }}"
+                                   class="pagination-link {{ $currentPage == $lastPage ? 'active' : '' }}">{{ $lastPage }}</a>
+                            @elseif($lastPage == 4)
+                                <a href="{{ $books->url(4) }}"
+                                   class="pagination-link {{ $currentPage == 4 ? 'active' : '' }}">4</a>
+                            @endif
+
+                            {{-- Next --}}
+                            @if($books->hasMorePages())
+                                <a href="{{ $books->nextPageUrl() }}" class="pagination-link">Дальше</a>
+                            @else
+                                <span class="pagination-link disabled">Дальше</span>
+                            @endif
+                        </div>
+                    </nav>
+                @endif
             @endif
-        </div>
+        </main>
     </div>
 @endsection
 
 @push('styles')
 <style>
-    .books-page {
+    /* Catalog Layout */
+    .catalog-page {
         display: grid;
-        grid-template-columns: 250px 1fr;
-        gap: 2rem;
+        grid-template-columns: 220px 1fr;
+        gap: 3rem;
+        align-items: start;
     }
 
-    .books-sidebar {
-        background: var(--bg-card);
-        border-radius: var(--radius);
-        padding: 1.5rem;
-        height: fit-content;
+    /* Sidebar */
+    .catalog-sidebar {
         position: sticky;
-        top: 100px;
+        top: 2rem;
     }
 
-    .books-sidebar h2 {
-        font-size: 1.125rem;
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+
+    .sidebar-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .sidebar-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
         margin-bottom: 1rem;
     }
 
-    .sidebar-categories {
+    .sidebar-nav {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
     }
 
-    .sidebar-categories a {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 0.75rem;
-        border-radius: var(--radius);
-        color: var(--text);
-        font-size: 0.875rem;
-    }
-
-    .sidebar-categories a:hover {
-        background: var(--bg);
-        text-decoration: none;
-    }
-
-    .sidebar-categories a.active {
-        background: var(--primary);
-        color: white;
-    }
-
-    .sidebar-categories a span {
-        opacity: 0.6;
-    }
-
-    .books-header {
+    .sidebar-link {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
+        padding: 0.5rem 0;
+        color: #111827;
+        font-size: 0.95rem;
+        border-bottom: none;
+        transition: color 0.2s;
     }
 
-    .books-sort {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 0.875rem;
+    .sidebar-link:hover {
+        color: #3b82f6;
     }
 
-    .books-sort span {
-        color: var(--text-muted);
-    }
-
-    .books-sort a {
-        color: var(--text-muted);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-    }
-
-    .books-sort a:hover {
-        color: var(--text);
-        text-decoration: none;
-    }
-
-    .books-sort a.active {
-        color: var(--primary);
+    .sidebar-link.active {
+        color: #3b82f6;
         font-weight: 500;
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: var(--text-muted);
+    .sidebar-link-name {
+        flex: 1;
     }
 
+    .sidebar-link-count {
+        color: #9ca3af;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+    }
+
+    .sidebar-link:hover .sidebar-link-count,
+    .sidebar-link.active .sidebar-link-count {
+        color: #3b82f6;
+    }
+
+    /* Main Content */
+    .catalog-content {
+        min-width: 0;
+    }
+
+    .catalog-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 2rem;
+    }
+
+    /* Books Grid - 3 columns */
     .books-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
+        gap: 2rem;
+        margin-bottom: 3rem;
     }
 
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6b7280;
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pagination-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        color: #4b5563;
+        font-size: 0.95rem;
+        font-weight: 500;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .pagination-link:hover:not(.disabled):not(.active) {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    .pagination-link.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    .pagination-link.disabled {
+        color: #d1d5db;
+        cursor: not-allowed;
+    }
+
+    .pagination-ellipsis {
+        color: #9ca3af;
+        padding: 0 0.5rem;
+    }
+
+    /* Responsive */
     @media (max-width: 1200px) {
+        .books-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .catalog-page {
+            grid-template-columns: 180px 1fr;
+            gap: 2rem;
+        }
+
         .books-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
 
     @media (max-width: 768px) {
-        .books-grid {
+        .catalog-page {
             grid-template-columns: 1fr;
+        }
+
+        .catalog-sidebar {
+            position: static;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 0;
+        }
+
+        .books-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
         }
     }
 
-    @media (max-width: 1024px) {
-        .books-page {
+    @media (max-width: 480px) {
+        .catalog-sidebar {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
-        .books-sidebar {
-            position: static;
-        }
-
-        .sidebar-categories {
-            flex-direction: row;
-            flex-wrap: wrap;
+        .books-grid {
+            grid-template-columns: 1fr;
+            max-width: 280px;
+            margin: 0 auto 3rem;
         }
     }
 </style>
