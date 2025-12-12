@@ -49,11 +49,29 @@
                 @method('patch')
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Имя</label>
-                    <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" class="form-input @error('name') error @enderror">
+                    <label for="name" class="form-label">Никнейм</label>
+                    <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required autofocus autocomplete="username" class="form-input @error('name') error @enderror">
                     @error('name')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name" class="form-label">Имя</label>
+                        <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $user->first_name) }}" autocomplete="given-name" class="form-input @error('first_name') error @enderror">
+                        @error('first_name')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name" class="form-label">Фамилия</label>
+                        <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" autocomplete="family-name" class="form-input @error('last_name') error @enderror">
+                        @error('last_name')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -189,6 +207,7 @@
     .profile-section-danger .profile-section-header h2 { color: #dc2626; }
 
     .profile-form { max-width: 400px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-group { margin-bottom: 1.25rem; }
     .form-label { display: block; font-size: 0.9rem; font-weight: 500; color: var(--text-main); margin-bottom: 0.5rem; }
     .form-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; background: var(--bg-card); color: var(--text-main); transition: border-color 0.2s, box-shadow 0.2s; }

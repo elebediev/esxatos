@@ -15,6 +15,8 @@ class User extends Authenticatable
     protected $fillable = [
         'drupal_uid',
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'drupal_password_hash',
