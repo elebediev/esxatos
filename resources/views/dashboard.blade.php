@@ -63,19 +63,8 @@
 @endsection
 
 @push('styles')
+@include('partials.dashboard-styles')
 <style>
-    .dashboard-page { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; }
-    .dashboard-sidebar { }
-    .dashboard-nav { display: flex; flex-direction: column; gap: 0.25rem; }
-    .dashboard-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-secondary); font-weight: 500; transition: all 0.2s; text-decoration: none; }
-    .dashboard-nav-link:hover { background: var(--bg-secondary); color: var(--text-main); }
-    .dashboard-nav-link.active { background: var(--primary); color: white; }
-    .nav-badge { background: #ef4444; color: white; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; margin-left: auto; }
-    .dashboard-nav-link.logout { width: 100%; border: none; background: none; cursor: pointer; text-align: left; font-size: 1rem; font-family: inherit; }
-    .dashboard-nav-link.logout:hover { background: #fee2e2; color: #dc2626; }
-    .dashboard-nav-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-    .dashboard-content { }
-    .dashboard-title { font-size: 1.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 2rem; }
     .dashboard-welcome { display: flex; align-items: center; gap: 1.5rem; background: var(--bg-card); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 1px 3px var(--shadow); }
     .welcome-icon { color: var(--primary); }
     .welcome-text h2 { font-size: 1.25rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem; }
@@ -87,6 +76,6 @@
     .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     .stat-label { font-size: 0.875rem; color: var(--text-muted); }
     @media (max-width: 1024px) { .dashboard-stats { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) { .dashboard-page { grid-template-columns: 1fr; } .dashboard-sidebar { order: 2; } .dashboard-nav { flex-direction: row; flex-wrap: wrap; } .dashboard-nav-form { margin: 0; padding: 0; border: none; } .dashboard-stats { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .dashboard-stats { grid-template-columns: 1fr; } }
 </style>
 @endpush

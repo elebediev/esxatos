@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AudioController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
@@ -71,6 +72,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages/{thread}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{thread}/reply', [MessageController::class, 'reply'])->name('messages.reply');
     Route::delete('/messages/{thread}', [MessageController::class, 'destroy'])->name('messages.destroy');
+});
+
+// Admin routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
 });
 
 require __DIR__.'/auth.php';
