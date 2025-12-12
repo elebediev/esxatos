@@ -91,9 +91,66 @@
         </div>
 
         @if($users->hasPages())
-        <div class="users-pagination">
-            {{ $users->links() }}
-        </div>
+        <nav class="pagination-wrapper">
+            <div class="pagination">
+                @php
+                    $currentPage = $users->currentPage();
+                    $lastPage = $users->lastPage();
+                @endphp
+                @if($users->onFirstPage())
+                    <span class="pagination-link disabled">Назад</span>
+                @else
+                    <a href="{{ $users->previousPageUrl() }}" class="pagination-link">Назад</a>
+                @endif
+
+                @if($lastPage <= 7)
+                    @for($i = 1; $i <= $lastPage; $i++)
+                        <a href="{{ $users->url($i) }}"
+                           class="pagination-link {{ $currentPage == $i ? 'active' : '' }}">{{ $i }}</a>
+                    @endfor
+                @else
+                    {{-- Перші 3 сторінки --}}
+                    @for($i = 1; $i <= min(3, $lastPage); $i++)
+                        <a href="{{ $users->url($i) }}"
+                           class="pagination-link {{ $currentPage == $i ? 'active' : '' }}">{{ $i }}</a>
+                    @endfor
+
+                    {{-- Еліпсис перед поточною групою --}}
+                    @if($currentPage > 5)
+                        <span class="pagination-ellipsis">...</span>
+                    @endif
+
+                    {{-- Сторінки навколо поточної (попередня, поточна, наступна) --}}
+                    @if($currentPage > 3 && $currentPage < $lastPage - 2)
+                        @if($currentPage > 4)
+                            <a href="{{ $users->url($currentPage - 1) }}"
+                               class="pagination-link">{{ $currentPage - 1 }}</a>
+                        @endif
+                        <a href="{{ $users->url($currentPage) }}"
+                           class="pagination-link active">{{ $currentPage }}</a>
+                        @if($currentPage < $lastPage - 3)
+                            <a href="{{ $users->url($currentPage + 1) }}"
+                               class="pagination-link">{{ $currentPage + 1 }}</a>
+                        @endif
+                    @endif
+
+                    {{-- Еліпсис після поточної групи --}}
+                    @if($currentPage < $lastPage - 4)
+                        <span class="pagination-ellipsis">...</span>
+                    @endif
+
+                    {{-- Остання сторінка --}}
+                    <a href="{{ $users->url($lastPage) }}"
+                       class="pagination-link {{ $currentPage == $lastPage ? 'active' : '' }}">{{ $lastPage }}</a>
+                @endif
+
+                @if($users->hasMorePages())
+                    <a href="{{ $users->nextPageUrl() }}" class="pagination-link">Дальше</a>
+                @else
+                    <span class="pagination-link disabled">Дальше</span>
+                @endif
+            </div>
+        </nav>
         @endif
     </div>
 </div>
@@ -217,9 +274,13 @@
         padding: 3rem !important;
     }
 
-    .users-pagination {
-        margin-top: 1.5rem;
-    }
+    .pagination-wrapper { display: flex; justify-content: center; margin-top: 1.5rem; }
+    .pagination { display: flex; align-items: center; gap: 0.5rem; }
+    .pagination-link { display: flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 0.75rem; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; background: var(--bg-card); transition: all 0.2s; text-decoration: none; }
+    .pagination-link:hover:not(.disabled):not(.active) { border-color: var(--primary); color: var(--primary); }
+    .pagination-link.active { background: var(--primary); border-color: var(--primary); color: white; }
+    .pagination-link.disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.5; }
+    .pagination-ellipsis { color: var(--text-muted); padding: 0 0.5rem; }
 
     @media (max-width: 1024px) {
         .users-table-wrap { overflow-x: auto; }
