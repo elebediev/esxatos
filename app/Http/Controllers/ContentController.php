@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class ContentController extends Controller
@@ -40,16 +41,22 @@ class ContentController extends Controller
 
         $items = $query->paginate(24)->withQueryString();
 
-        // Get categories for this content type (children of root category)
-        $categories = Category::active()
-            ->where(function ($q) {
-                $q->where('id', $this->rootCategoryId)
-                    ->orWhere('parent_id', $this->rootCategoryId);
-            })
-            ->withCount(['books' => fn($q) => $q->published()->ofType($this->contentType)])
-            ->having('books_count', '>', 0)
-            ->orderBy('weight')
-            ->get();
+        // Get categories for this content type (children of root category), cached for 1 hour
+        $cacheKey = $this->contentType . '_sidebar_categories';
+        $rootCategoryId = $this->rootCategoryId;
+        $contentType = $this->contentType;
+
+        $categories = Cache::remember($cacheKey, 3600, function () use ($rootCategoryId, $contentType) {
+            return Category::active()
+                ->where(function ($q) use ($rootCategoryId) {
+                    $q->where('id', $rootCategoryId)
+                        ->orWhere('parent_id', $rootCategoryId);
+                })
+                ->withCount(['books' => fn($q) => $q->published()->ofType($contentType)])
+                ->having('books_count', '>', 0)
+                ->orderBy('weight')
+                ->get();
+        });
 
         return view('content.index', [
             'items' => $items,

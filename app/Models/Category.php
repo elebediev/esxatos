@@ -2,15 +2,29 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\Admin\CacheController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        $clearCache = function () {
+            foreach (array_keys(CacheController::CACHE_KEYS) as $key) {
+                Cache::forget($key);
+            }
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
 
     protected $fillable = [
         'drupal_tid',

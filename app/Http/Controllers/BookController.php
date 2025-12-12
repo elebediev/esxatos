@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -34,15 +35,17 @@ class BookController extends Controller
 
         $books = $query->paginate(24)->withQueryString();
 
-        $categories = Category::active()
-            ->where(function ($q) {
-                // Only show categories under "КНИГИ ЭСХАТОС" (id=1)
-                $q->where('id', 1)->orWhere('parent_id', 1);
-            })
-            ->withCount(['books' => fn($q) => $q->published()->books()])
-            ->having('books_count', '>', 0)
-            ->orderBy('weight')
-            ->get();
+        $categories = Cache::remember('books_sidebar_categories', 3600, function () {
+            return Category::active()
+                ->where(function ($q) {
+                    // Only show categories under "КНИГИ ЭСХАТОС" (id=1)
+                    $q->where('id', 1)->orWhere('parent_id', 1);
+                })
+                ->withCount(['books' => fn($q) => $q->published()->books()])
+                ->having('books_count', '>', 0)
+                ->orderBy('weight')
+                ->get();
+        });
 
         return view('books.index', compact('books', 'categories', 'sort'));
     }

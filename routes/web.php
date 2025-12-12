@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CacheController as AdminCacheController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AudioController;
 use App\Http\Controllers\BookController;
@@ -83,6 +84,11 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+
+    // Cache management
+    Route::get('/cache', [AdminCacheController::class, 'index'])->name('cache.index');
+    Route::post('/cache/clear/{key}', [AdminCacheController::class, 'clear'])->name('cache.clear');
+    Route::post('/cache/clear-all', [AdminCacheController::class, 'clearAll'])->name('cache.clear-all');
 });
 
 require __DIR__.'/auth.php';
