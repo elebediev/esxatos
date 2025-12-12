@@ -21,6 +21,16 @@ class ImportBooksCommand extends Command
     private array $categoryMap = [];
     private array $userMap = [];
 
+    // Root category TIDs in Drupal
+    private const DRUPAL_MODULES_ROOT_TID = 28;  // "МОДУЛИ BIBLEQUTE"
+    private const DRUPAL_SOFTWARE_ROOT_TID = 56; // "ПРОГРАММЫ"
+    private const DRUPAL_AUDIO_TID = 3534;       // "AUDIO" category
+
+    // Child TIDs (for quick lookup)
+    private array $modulesTids = [];
+    private array $softwareTids = [];
+    private array $audioTids = [];
+
     public function handle(): int
     {
         $this->info('Starting books import from Drupal...');
@@ -28,6 +38,9 @@ class ImportBooksCommand extends Command
         // Pre-load category mapping (drupal_tid => laravel_id)
         $this->categoryMap = Category::pluck('id', 'drupal_tid')->toArray();
         $this->userMap = User::pluck('id', 'drupal_uid')->toArray();
+
+        // Build content type category maps
+        $this->buildContentTypeMaps();
 
         $query = DB::connection('drupal')
             ->table('node as n')
@@ -132,11 +145,15 @@ class ImportBooksCommand extends Command
             ->where('nid', $node->nid)
             ->first();
 
+        // Determine content type based on categories
+        $contentType = $this->determineContentType($node->nid);
+
         // Create book
         $book = Book::create([
             'drupal_nid' => $node->nid,
             'title' => $node->title,
             'slug' => $slug,
+            'content_type' => $contentType,
             'description' => $description,
             'description_plain' => Str::limit($descriptionPlain, 60000),
             'cover_image' => $coverImage,
@@ -268,5 +285,65 @@ class ImportBooksCommand extends Command
             'mp3', 'wav', 'ogg' => 'audio',
             default => null,
         };
+    }
+
+    private function buildContentTypeMaps(): void
+    {
+        // Get all child TIDs for "МОДУЛИ BIBLEQUTE" (tid=28)
+        $this->modulesTids = DB::connection('drupal')
+            ->table('taxonomy_term_hierarchy')
+            ->where('parent', self::DRUPAL_MODULES_ROOT_TID)
+            ->pluck('tid')
+            ->toArray();
+        $this->modulesTids[] = self::DRUPAL_MODULES_ROOT_TID;
+
+        // Get all child TIDs for "ПРОГРАММЫ" (tid=56)
+        $this->softwareTids = DB::connection('drupal')
+            ->table('taxonomy_term_hierarchy')
+            ->where('parent', self::DRUPAL_SOFTWARE_ROOT_TID)
+            ->pluck('tid')
+            ->toArray();
+        $this->softwareTids[] = self::DRUPAL_SOFTWARE_ROOT_TID;
+
+        // Audio category (tid=3534)
+        $this->audioTids = [self::DRUPAL_AUDIO_TID];
+
+        $this->info("Content type mappings:");
+        $this->info("  Modules TIDs: " . count($this->modulesTids));
+        $this->info("  Software TIDs: " . count($this->softwareTids));
+        $this->info("  Audio TIDs: " . count($this->audioTids));
+    }
+
+    private function determineContentType(int $nid): string
+    {
+        $tids = DB::connection('drupal')
+            ->table('taxonomy_index')
+            ->where('nid', $nid)
+            ->pluck('tid')
+            ->toArray();
+
+        // Check for audio first (it's a subcategory inside books)
+        foreach ($tids as $tid) {
+            if (in_array($tid, $this->audioTids)) {
+                return Book::TYPE_AUDIO;
+            }
+        }
+
+        // Check for modules
+        foreach ($tids as $tid) {
+            if (in_array($tid, $this->modulesTids)) {
+                return Book::TYPE_MODULE;
+            }
+        }
+
+        // Check for software
+        foreach ($tids as $tid) {
+            if (in_array($tid, $this->softwareTids)) {
+                return Book::TYPE_SOFTWARE;
+            }
+        }
+
+        // Default to book
+        return Book::TYPE_BOOK;
     }
 }

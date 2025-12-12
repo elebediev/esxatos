@@ -1,13 +1,28 @@
 @extends('layouts.app')
 
-@section('title', $book->title . ' - Esxatos')
-@section('description', Str::limit(strip_tags($book->description), 160))
+@section('title', $item->title . ' - Esxatos')
+@section('description', Str::limit(strip_tags($item->description), 160))
+
+@php
+    $indexRoute = match($contentType) {
+        'module' => 'modules.index',
+        'software' => 'software.index',
+        'audio' => 'audio.index',
+        default => 'books.index',
+    };
+    $showRoute = match($contentType) {
+        'module' => 'module.show',
+        'software' => 'software.show',
+        'audio' => 'audio.show',
+        default => 'book.show',
+    };
+@endphp
 
 @section('meta')
-    <meta property="og:title" content="{{ $book->title }}">
-    <meta property="og:description" content="{{ Str::limit(strip_tags($book->description), 160) }}">
-    @if($book->cover_image)
-        <meta property="og:image" content="{{ asset('storage/uploads/' . $book->cover_image) }}">
+    <meta property="og:title" content="{{ $item->title }}">
+    <meta property="og:description" content="{{ Str::limit(strip_tags($item->description), 160) }}">
+    @if($item->cover_image)
+        <meta property="og:image" content="{{ asset('storage/uploads/' . $item->cover_image) }}">
     @endif
     <meta property="og:type" content="book">
 @endsection
@@ -17,46 +32,67 @@
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Главная</a>
         <span class="breadcrumb-separator">/</span>
-        <a href="{{ route('books.index') }}">Книги</a>
-        @if($book->categories->isNotEmpty())
+        <a href="{{ route($indexRoute) }}">{{ $titlePlural }}</a>
+        @if($item->categories->isNotEmpty())
             <span class="breadcrumb-separator">/</span>
-            <a href="{{ route('category.show', $book->categories->first()->slug) }}">{{ $book->categories->first()->name }}</a>
+            <a href="{{ route('category.show', $item->categories->first()->slug) }}">{{ $item->categories->first()->name }}</a>
         @endif
         <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">{{ Str::limit($book->title, 50) }}</span>
+        <span class="breadcrumb-current">{{ Str::limit($item->title, 50) }}</span>
     </nav>
 
     {{-- Author --}}
-    @if($book->user)
-        <div class="book-author-name">{{ $book->user->name }}</div>
+    @if($item->user)
+        <div class="book-author-name">{{ $item->user->name }}</div>
     @endif
 
     {{-- Title --}}
-    <h1 class="book-title">{{ $book->title }}</h1>
+    <h1 class="book-title">{{ $item->title }}</h1>
 
     {{-- Main Grid --}}
     <div class="book-layout">
         {{-- Column 1: Cover --}}
         <div class="book-cover-column">
             <div class="book-cover-wrapper">
-                @if($book->cover_image)
-                    <img src="{{ asset('storage/uploads/' . $book->cover_image) }}"
-                         alt="{{ $book->cover_alt ?? $book->title }}"
+                @if($item->cover_image)
+                    <img src="{{ asset('storage/uploads/' . $item->cover_image) }}"
+                         alt="{{ $item->cover_alt ?? $item->title }}"
                          class="book-cover">
                 @else
                     <div class="book-cover-placeholder">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                        </svg>
+                        @if($contentType === 'audio')
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                            </svg>
+                        @elseif($contentType === 'module')
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                        @elseif($contentType === 'software')
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        @else
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        @endif
                     </div>
                 @endif
             </div>
 
             {{-- Download Button --}}
-            @if($book->files->isNotEmpty())
+            @if($item->files->isNotEmpty())
                 <div class="download-section">
-                    @foreach($book->files as $file)
+                    @foreach($item->files as $file)
                         <a href="{{ $file->url }}" target="_blank" rel="noopener" class="btn-download">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -75,8 +111,8 @@
             <div class="meta-item">
                 <span class="meta-label">Категория</span>
                 <span class="meta-value">
-                    @if($book->categories->isNotEmpty())
-                        {{ $book->categories->pluck('name')->join(', ') }}
+                    @if($item->categories->isNotEmpty())
+                        {{ $item->categories->pluck('name')->join(', ') }}
                     @else
                         —
                     @endif
@@ -84,13 +120,13 @@
             </div>
             <div class="meta-item">
                 <span class="meta-label">Просмотров</span>
-                <span class="meta-value">{{ number_format($book->views_count, 0, '', ' ') }}</span>
+                <span class="meta-value">{{ number_format($item->views_count, 0, '', ' ') }}</span>
             </div>
             <div class="meta-item">
                 <span class="meta-label">Рейтинг</span>
                 <span class="meta-value">
-                    @if($book->rating_count > 0)
-                        {{ number_format($book->rating_stars, 1) }} / 5
+                    @if($item->rating_count > 0)
+                        {{ number_format($item->rating_stars, 1) }} / 5
                     @else
                         —
                     @endif
@@ -98,15 +134,15 @@
             </div>
             <div class="meta-item">
                 <span class="meta-label">Добавлено</span>
-                <span class="meta-value">{{ $book->published_at?->format('d.m.Y') ?? $book->created_at->format('d.m.Y') }}</span>
+                <span class="meta-value">{{ $item->published_at?->format('d.m.Y') ?? $item->created_at->format('d.m.Y') }}</span>
             </div>
         </div>
 
         {{-- Column 3: Description --}}
         <div class="book-description-column">
-            @if($book->description)
+            @if($item->description)
                 <div class="book-description">
-                    {!! $book->description !!}
+                    {!! $item->description !!}
                 </div>
             @else
                 <p class="text-muted">Описание отсутствует</p>
@@ -114,19 +150,19 @@
         </div>
     </div>
 
-    {{-- Related Books --}}
-    @if($relatedBooks->isNotEmpty())
+    {{-- Related Items --}}
+    @if($relatedItems->isNotEmpty())
         <section class="related-section">
             <div class="flex items-center justify-between" style="margin-bottom: 1.5rem;">
-                <h2 class="section-title">Похожие книги</h2>
-                <a href="{{ route('books.index') }}" class="see-all-link">
-                    Все книги
+                <h2 class="section-title">Похожие {{ mb_strtolower($titlePlural) }}</h2>
+                <a href="{{ route($indexRoute) }}" class="see-all-link">
+                    Все {{ mb_strtolower($titlePlural) }}
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
             </div>
             <div class="related-grid">
-                @foreach($relatedBooks->take(4) as $relatedBook)
-                    @include('components.book-card-modern', ['book' => $relatedBook])
+                @foreach($relatedItems->take(4) as $relatedItem)
+                    @include('components.content-card', ['item' => $relatedItem, 'contentType' => $contentType])
                 @endforeach
             </div>
         </section>

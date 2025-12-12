@@ -12,10 +12,16 @@ class Book extends Model
 {
     use HasFactory;
 
+    public const TYPE_BOOK = 'book';
+    public const TYPE_MODULE = 'module';
+    public const TYPE_SOFTWARE = 'software';
+    public const TYPE_AUDIO = 'audio';
+
     protected $fillable = [
         'drupal_nid',
         'title',
         'slug',
+        'content_type',
         'description',
         'description_plain',
         'cover_image',
@@ -100,6 +106,31 @@ class Book extends Model
             "MATCH(title, description_plain) AGAINST(? IN NATURAL LANGUAGE MODE)",
             [$term]
         );
+    }
+
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('content_type', $type);
+    }
+
+    public function scopeBooks($query)
+    {
+        return $query->where('content_type', self::TYPE_BOOK);
+    }
+
+    public function scopeModules($query)
+    {
+        return $query->where('content_type', self::TYPE_MODULE);
+    }
+
+    public function scopeSoftware($query)
+    {
+        return $query->where('content_type', self::TYPE_SOFTWARE);
+    }
+
+    public function scopeAudio($query)
+    {
+        return $query->where('content_type', self::TYPE_AUDIO);
     }
 
     public function incrementViews(): void

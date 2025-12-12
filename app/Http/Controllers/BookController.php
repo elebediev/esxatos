@@ -12,6 +12,7 @@ class BookController extends Controller
     public function index(Request $request): View
     {
         $query = Book::published()
+            ->books() // Only show books, not modules/software/audio
             ->with(['categories'])
             ->latest('published_at');
 
@@ -34,7 +35,11 @@ class BookController extends Controller
         $books = $query->paginate(24)->withQueryString();
 
         $categories = Category::active()
-            ->withCount(['books' => fn($q) => $q->published()])
+            ->where(function ($q) {
+                // Only show categories under "КНИГИ ЭСХАТОС" (id=1)
+                $q->where('id', 1)->orWhere('parent_id', 1);
+            })
+            ->withCount(['books' => fn($q) => $q->published()->books()])
             ->having('books_count', '>', 0)
             ->orderBy('weight')
             ->get();
@@ -45,14 +50,16 @@ class BookController extends Controller
     public function show(string $slug): View
     {
         $book = Book::where('slug', $slug)
+            ->books()
             ->published()
             ->with(['categories', 'files', 'user'])
             ->firstOrFail();
 
         $book->incrementViews();
 
-        // Related books (same categories)
+        // Related books (same type and categories)
         $relatedBooks = Book::published()
+            ->books()
             ->whereHas('categories', fn($q) => $q->whereIn('categories.id', $book->categories->pluck('id')))
             ->where('id', '!=', $book->id)
             ->inRandomOrder()

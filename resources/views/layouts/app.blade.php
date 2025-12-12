@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,19 +10,55 @@
 
     @yield('meta')
 
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <script>
+        // Apply theme before page renders to prevent flash
+        (function() {
+            const theme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <style>
-        :root {
+        /* Light theme (default) */
+        :root, [data-theme="light"] {
             --primary: #3b82f6;
+            --primary-hover: #2563eb;
             --primary-dark: #2563eb;
             --text-main: #111827;
-            --text-secondary: #6b7280;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
             --bg-body: #f1f3f5;
+            --bg-secondary: #f3f4f6;
             --bg-card: #ffffff;
+            --bg-header: #ffffff;
             --border: #e5e7eb;
+            --shadow: rgba(0,0,0,0.1);
+            --logo-color: #274E87;
+        }
+
+        /* Dark theme */
+        [data-theme="dark"] {
+            --primary: #60a5fa;
+            --primary-hover: #93c5fd;
+            --primary-dark: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-secondary: #d1d5db;
+            --text-muted: #6b7280;
+            --bg-body: #111827;
+            --bg-secondary: #1f2937;
+            --bg-card: #1f2937;
+            --bg-header: #1f2937;
+            --border: #374151;
+            --shadow: rgba(0,0,0,0.3);
+            --logo-color: #60a5fa;
         }
 
         * {
@@ -54,19 +90,19 @@
 
         /* HEADER */
         .header {
-            background: #fff;
-            border-bottom: 1px solid transparent;
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border);
             padding: 1.25rem 0;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            color: #274E87;
+            color: var(--logo-color);
         }
 
         .logo:hover {
-            color: #3b82f6;
+            color: var(--primary);
         }
 
         .logo svg {
@@ -82,7 +118,7 @@
 
         .nav-link {
             font-size: 0.95rem;
-            color: #4b5563;
+            color: var(--text-secondary);
             font-weight: 500;
             font-family: 'Inter', sans-serif;
         }
@@ -101,7 +137,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #4b5563;
+            color: var(--text-secondary);
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
@@ -111,8 +147,39 @@
             color: var(--primary);
         }
 
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            width: 20px;
+            height: 20px;
+        }
+
+        [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+        [data-theme="light"] .theme-toggle .icon-moon { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
         .btn-login {
-            background-color: #3b82f6;
+            background-color: var(--primary);
             color: white;
             padding: 0.6rem 1.5rem;
             border-radius: 9999px;
@@ -124,7 +191,7 @@
         }
 
         .btn-login:hover {
-            background-color: #2563eb;
+            background-color: var(--primary-dark);
         }
 
         /* MAIN CONTENT */
@@ -135,7 +202,7 @@
 
         /* FOOTER */
         .footer {
-            background: #fff;
+            background: var(--bg-header);
             padding: 4rem 0 2rem;
             border-top: 1px solid var(--border);
             font-size: 0.875rem;
@@ -152,7 +219,7 @@
         .footer-logo {
             font-weight: 800;
             font-size: 1.25rem;
-            color: #274E87;
+            color: var(--logo-color);
             margin-bottom: 1rem;
             display: block;
             text-transform: uppercase;
@@ -230,10 +297,10 @@
             <nav class="nav-links">
                 <a href="{{ route('home') }}" class="nav-link">Главная</a>
                 <a href="{{ route('books.index') }}" class="nav-link">Книги</a>
+                <a href="{{ route('modules.index') }}" class="nav-link">Модули BQ</a>
+                <a href="{{ route('software.index') }}" class="nav-link">Софт</a>
+                <a href="{{ route('audio.index') }}" class="nav-link">Аудио</a>
                 <a href="#" class="nav-link">Статьи</a>
-                <a href="#" class="nav-link">Правила сайта</a>
-                <a href="#" class="nav-link">Про нас</a>
-                <a href="#" class="nav-link">Партнёры</a>
             </nav>
 
             <!-- Right Actions -->
@@ -244,6 +311,18 @@
                     </svg>
                     Поиск
                 </a>
+
+                <!-- Theme Toggle -->
+                <button type="button" class="theme-toggle" id="themeToggle" title="Переключить тему">
+                    <!-- Sun icon (shown in dark mode) -->
+                    <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <!-- Moon icon (shown in light mode) -->
+                    <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                </button>
 
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn-login">Кабинет</a>
@@ -277,9 +356,10 @@
                 <div class="footer-links">
                     <a href="{{ route('home') }}">Главная</a>
                     <a href="{{ route('books.index') }}">Книги</a>
+                    <a href="{{ route('modules.index') }}">Модули BQ</a>
+                    <a href="{{ route('software.index') }}">Софт</a>
+                    <a href="{{ route('audio.index') }}">Аудио</a>
                     <a href="#">Статьи</a>
-                    <a href="#">Правила сайта</a>
-                    <a href="#">Партнёры</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -290,6 +370,18 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
 
     @stack('scripts')
 </body>
