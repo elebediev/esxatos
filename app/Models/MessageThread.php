@@ -15,6 +15,8 @@ class MessageThread extends Model
     protected $fillable = [
         'drupal_thread_id',
         'subject',
+        'created_at',
+        'updated_at',
     ];
 
     public function messages(): HasMany

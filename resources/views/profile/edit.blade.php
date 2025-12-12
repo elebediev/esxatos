@@ -12,6 +12,18 @@
                 </svg>
                 Главная
             </a>
+            <a href="{{ route('messages.index') }}" class="dashboard-nav-link">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Сообщения
+                @php
+                    $unreadMessages = \App\Models\MessageThread::forUser(auth()->user())->withUnread(auth()->user())->count();
+                @endphp
+                @if($unreadMessages > 0)
+                    <span class="nav-badge">{{ $unreadMessages }}</span>
+                @endif
+            </a>
             <a href="{{ route('profile.edit') }}" class="dashboard-nav-link active">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -193,6 +205,7 @@
     .dashboard-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-secondary); font-weight: 500; transition: all 0.2s; }
     .dashboard-nav-link:hover { background: var(--bg-secondary); color: var(--text-main); }
     .dashboard-nav-link.active { background: var(--primary); color: white; }
+    .nav-badge { background: #ef4444; color: white; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; margin-left: auto; }
     .dashboard-nav-link.logout { width: 100%; border: none; background: none; cursor: pointer; text-align: left; font-size: 1rem; font-family: inherit; }
     .dashboard-nav-link.logout:hover { background: #fee2e2; color: #dc2626; }
     .dashboard-nav-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }

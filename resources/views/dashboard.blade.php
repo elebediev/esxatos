@@ -4,31 +4,7 @@
 
 @section('content')
 <div class="dashboard-page">
-    <div class="dashboard-sidebar">
-        <nav class="dashboard-nav">
-            <a href="{{ route('dashboard') }}" class="dashboard-nav-link active">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-                Главная
-            </a>
-            <a href="{{ route('profile.edit') }}" class="dashboard-nav-link">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                Профиль
-            </a>
-            <form method="POST" action="{{ route('logout') }}" class="dashboard-nav-form">
-                @csrf
-                <button type="submit" class="dashboard-nav-link logout">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                    Выйти
-                </button>
-            </form>
-        </nav>
-    </div>
+    @include('partials.dashboard-sidebar')
 
     <div class="dashboard-content">
         <h1 class="dashboard-title">Личный кабинет</h1>
@@ -91,9 +67,10 @@
     .dashboard-page { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; }
     .dashboard-sidebar { }
     .dashboard-nav { display: flex; flex-direction: column; gap: 0.25rem; }
-    .dashboard-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-secondary); font-weight: 500; transition: all 0.2s; }
+    .dashboard-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-secondary); font-weight: 500; transition: all 0.2s; text-decoration: none; }
     .dashboard-nav-link:hover { background: var(--bg-secondary); color: var(--text-main); }
     .dashboard-nav-link.active { background: var(--primary); color: white; }
+    .nav-badge { background: #ef4444; color: white; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; margin-left: auto; }
     .dashboard-nav-link.logout { width: 100%; border: none; background: none; cursor: pointer; text-align: left; font-size: 1rem; font-family: inherit; }
     .dashboard-nav-link.logout:hover { background: #fee2e2; color: #dc2626; }
     .dashboard-nav-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
