@@ -47,7 +47,7 @@
 
                 <div class="form-group">
                     <label for="subject" class="form-label">Тема</label>
-                    <input type="text" name="subject" id="subject" value="{{ old('subject') }}" required
+                    <input type="text" name="subject" id="subject" value="{{ old('subject', $subject ?? '') }}" required
                            class="form-input @error('subject') error @enderror"
                            placeholder="Тема сообщения">
                     @error('subject')

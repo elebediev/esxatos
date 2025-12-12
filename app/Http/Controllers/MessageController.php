@@ -52,7 +52,9 @@ class MessageController extends Controller
             $recipient = User::find($request->to);
         }
 
-        return view('messages.create', compact('recipient'));
+        $subject = $request->get('subject');
+
+        return view('messages.create', compact('recipient', 'subject'));
     }
 
     public function store(Request $request)
