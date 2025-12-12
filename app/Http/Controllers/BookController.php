@@ -58,13 +58,19 @@ class BookController extends Controller
         $book->incrementViews();
 
         // Related books (same type and categories)
-        $relatedBooks = Book::published()
+        // Get IDs first, then shuffle in PHP (much faster than ORDER BY RAND())
+        $relatedBookIds = Book::published()
             ->books()
             ->whereHas('categories', fn($q) => $q->whereIn('categories.id', $book->categories->pluck('id')))
             ->where('id', '!=', $book->id)
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
+            ->limit(100)
+            ->pluck('id')
+            ->shuffle()
+            ->take(6);
+
+        $relatedBooks = $relatedBookIds->isNotEmpty()
+            ? Book::whereIn('id', $relatedBookIds)->get()
+            : collect();
 
         return view('books.show', compact('book', 'relatedBooks'));
     }
