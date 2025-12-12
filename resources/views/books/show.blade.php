@@ -161,6 +161,28 @@
                     @endif
                 </div>
             @endif
+
+            {{-- Target Program notice (when no club files yet) --}}
+            @if($isTargetProgram && $clubFiles->isEmpty())
+                <div class="download-section download-section-target">
+                    <div class="download-section-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        Целевая программа
+                    </div>
+                    <div class="target-program-info">
+                        Книга доступна по Целевой программе
+                    </div>
+                    <a href="{{ route('messages.create', ['to' => 1, 'subject' => 'Запрос файлов: ' . $book->title]) }}" class="file-info-link">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Запросить файлы
+                    </a>
+                </div>
+            @endif
         </div>
 
         {{-- Column 2: Content (Meta + Description) --}}
@@ -171,7 +193,9 @@
                     <span class="meta-label">Категория</span>
                     <span class="meta-value">
                         @if($book->categories->isNotEmpty())
-                            {{ $book->categories->pluck('name')->join(', ') }}
+                            @foreach($book->categories as $category)
+                                <a href="{{ route('category.show', $category->slug) }}" class="category-link">{{ $category->name }}</a>@if(!$loop->last), @endif
+                            @endforeach
                         @else
                             —
                         @endif
@@ -247,10 +271,12 @@
     .download-section-title { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
     .download-section-club { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
     .download-section-aide { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
+    .download-section-target { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
+    .target-program-info { padding: 0.75rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1)); border-radius: 8px; color: #b45309; font-size: 0.85rem; border: 1px solid rgba(245, 158, 11, 0.3); }
     .btn-download { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary); color: white; padding: 0.6rem 0.875rem; border-radius: 8px; font-weight: 600; font-size: 0.8rem; transition: background 0.2s; text-align: left; }
     .btn-download:hover { background: var(--primary-hover); color: white; }
-    .btn-download-club { background: #7c3aed; }
-    .btn-download-club:hover { background: #6d28d9; color: white; }
+    .btn-download-club { background: var(--primary); }
+    .btn-download-club:hover { background: var(--primary-hover); color: white; }
     .btn-download-aide { background: #dc2626; }
     .btn-download-aide:hover { background: #b91c1c; color: white; }
     .download-locked { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 8px; color: var(--text-muted); font-size: 0.8rem; border: 1px dashed var(--border); }
@@ -262,6 +288,8 @@
     .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .meta-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .meta-value { font-size: 0.95rem; color: var(--text-main); font-weight: 500; }
+    .category-link { color: var(--text-main); transition: color 0.2s, text-decoration 0.2s; }
+    .category-link:hover { color: var(--primary); text-decoration: underline; }
     .book-description-column { min-width: 0; }
     .book-description { color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem; }
     .book-description p { margin-bottom: 1rem; }

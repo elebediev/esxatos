@@ -49,6 +49,14 @@ class CategoryController extends Controller
             ->having('books_count', '>', 0)
             ->get();
 
-        return view('categories.show', compact('category', 'books', 'subcategories', 'sort'));
+        // All root categories for sidebar
+        $allCategories = Category::active()
+            ->roots()
+            ->withCount(['books' => fn($q) => $q->published()])
+            ->having('books_count', '>', 0)
+            ->orderBy('weight')
+            ->get();
+
+        return view('categories.show', compact('category', 'books', 'subcategories', 'allCategories', 'sort'));
     }
 }

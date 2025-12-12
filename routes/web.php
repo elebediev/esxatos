@@ -23,9 +23,8 @@ Route::get('/api/search/autocomplete', [SearchController::class, 'autocomplete']
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
 
-// Books
+// Books index page
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::get('/books/{slug}', [BookController::class, 'show'])->name('book.show');
 
 // BibleQuote Modules
 Route::get('/modules', [ModuleController::class, 'index'])->name('modules.index');
@@ -39,7 +38,7 @@ Route::get('/software/{slug}', [SoftwareController::class, 'show'])->name('softw
 Route::get('/audio', [AudioController::class, 'index'])->name('audio.index');
 Route::get('/audio/{slug}', [AudioController::class, 'show'])->name('audio.show');
 
-// Legacy URL support - redirect /files/{slug} to appropriate section
+// Legacy URL support - redirect /files/{slug} to new URLs
 Route::get('/files/{slug}', function (string $slug) {
     $book = \App\Models\Book::where('slug', $slug)->first();
     if ($book) {
@@ -50,6 +49,11 @@ Route::get('/files/{slug}', function (string $slug) {
             default => redirect()->route('book.show', $slug, 301),
         };
     }
+    return redirect()->route('book.show', $slug, 301);
+})->where('slug', '.*');
+
+// Legacy /books/{slug} redirect to root-level URLs
+Route::get('/books/{slug}', function (string $slug) {
     return redirect()->route('book.show', $slug, 301);
 })->where('slug', '.*');
 
@@ -80,3 +84,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 require __DIR__.'/auth.php';
+
+// Book show route at root level - MUST BE LAST to avoid conflicts with other routes
+// This catches /{slug} URLs like the old Drupal site
+Route::get('/{slug}', [BookController::class, 'show'])->name('book.show')->where('slug', '[a-z0-9\-]+');

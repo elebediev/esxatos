@@ -174,10 +174,10 @@ class ImportBooksCommand extends Command
 
         // Create URL redirect from old path
         if ($alias) {
-            $this->createRedirect($alias->alias, "books/{$slug}");
+            $this->createRedirect($alias->alias, $slug);
         }
         // Also redirect from node/nid
-        $this->createRedirect("node/{$node->nid}", "books/{$slug}");
+        $this->createRedirect("node/{$node->nid}", $slug);
 
         return $book;
     }

@@ -29,9 +29,9 @@
     <style>
         /* Light theme (default) */
         :root, [data-theme="light"] {
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-dark: #2563eb;
+            --primary: #274E87;
+            --primary-hover: #1e3d6b;
+            --primary-dark: #1e3d6b;
             --text-main: #111827;
             --text-secondary: #4b5563;
             --text-muted: #9ca3af;
@@ -46,9 +46,9 @@
 
         /* Dark theme */
         [data-theme="dark"] {
-            --primary: #60a5fa;
-            --primary-hover: #93c5fd;
-            --primary-dark: #3b82f6;
+            --primary: #5a8fd4;
+            --primary-hover: #7ba8e0;
+            --primary-dark: #4a7fc4;
             --text-main: #f3f4f6;
             --text-secondary: #d1d5db;
             --text-muted: #6b7280;
