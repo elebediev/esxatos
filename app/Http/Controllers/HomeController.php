@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -37,6 +38,7 @@ class HomeController extends Controller
         $stats = [
             'books' => Book::published()->count(),
             'categories' => Category::active()->count(),
+            'users' => User::count(),
         ];
 
         return view('home', compact('latestBooks', 'popularBooks', 'categories', 'stats'));

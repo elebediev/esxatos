@@ -40,7 +40,7 @@
                     <p>Книги не найдены</p>
                 </div>
             @else
-                <div class="grid grid-4">
+                <div class="books-grid">
                     @foreach($books as $book)
                         @include('components.book-card', ['book' => $book])
                     @endforeach
@@ -143,6 +143,24 @@
         text-align: center;
         padding: 4rem 2rem;
         color: var(--text-muted);
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        .books-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .books-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 1024px) {
