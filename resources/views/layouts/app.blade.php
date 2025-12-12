@@ -20,7 +20,7 @@
             --primary-dark: #2563eb;
             --text-main: #111827;
             --text-secondary: #6b7280;
-            --bg-body: #f9fafb;
+            --bg-body: #f1f3f5;
             --bg-card: #ffffff;
             --border: #e5e7eb;
         }

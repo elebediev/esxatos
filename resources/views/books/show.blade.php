@@ -52,6 +52,22 @@
                     </div>
                 @endif
             </div>
+
+            {{-- Download Button --}}
+            @if($book->files->isNotEmpty())
+                <div class="download-section">
+                    @foreach($book->files as $file)
+                        <a href="{{ $file->url }}" target="_blank" rel="noopener" class="btn-download">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Скачать{{ $file->file_type ? ' ' . strtoupper($file->file_type) : '' }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         {{-- Column 2: Meta Info --}}
@@ -86,82 +102,14 @@
             </div>
         </div>
 
-        {{-- Column 3: Accordions --}}
-        <div class="book-accordions-column">
-            {{-- Description Accordion --}}
-            <details class="accordion" open>
-                <summary class="accordion-header">
-                    <span>Описание</span>
-                    <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </summary>
-                <div class="accordion-content">
-                    @if($book->description)
-                        {!! $book->description !!}
-                    @else
-                        <p class="text-muted">Описание отсутствует</p>
-                    @endif
+        {{-- Column 3: Description --}}
+        <div class="book-description-column">
+            @if($book->description)
+                <div class="book-description">
+                    {!! $book->description !!}
                 </div>
-            </details>
-
-            {{-- Contents Accordion --}}
-            <details class="accordion">
-                <summary class="accordion-header">
-                    <span>Содержание</span>
-                    <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </summary>
-                <div class="accordion-content">
-                    <p class="text-muted">Содержание книги недоступно</p>
-                </div>
-            </details>
-
-            {{-- Details Accordion --}}
-            <details class="accordion">
-                <summary class="accordion-header">
-                    <span>Подробности</span>
-                    <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </summary>
-                <div class="accordion-content">
-                    <div class="details-grid">
-                        @if($book->categories->isNotEmpty())
-                            <div class="detail-item">
-                                <span class="detail-label">Категория:</span>
-                                <span class="detail-value">{{ $book->categories->pluck('name')->join(', ') }}</span>
-                            </div>
-                        @endif
-                        <div class="detail-item">
-                            <span class="detail-label">Добавлено:</span>
-                            <span class="detail-value">{{ $book->published_at?->format('d.m.Y') ?? $book->created_at->format('d.m.Y') }}</span>
-                        </div>
-                        @if($book->files->isNotEmpty())
-                            <div class="detail-item">
-                                <span class="detail-label">Формат:</span>
-                                <span class="detail-value">{{ $book->files->pluck('file_type')->filter()->unique()->map(fn($t) => strtoupper($t))->join(', ') ?: '—' }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </details>
-
-            {{-- Download Button --}}
-            @if($book->files->isNotEmpty())
-                <div class="download-section">
-                    @foreach($book->files as $file)
-                        <a href="{{ $file->url }}" target="_blank" rel="noopener" class="btn-download">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            Скачать{{ $file->file_type ? ' ' . strtoupper($file->file_type) : '' }}
-                        </a>
-                    @endforeach
-                </div>
+            @else
+                <p class="text-muted">Описание отсутствует</p>
             @endif
         </div>
     </div>
@@ -233,7 +181,7 @@
     /* Main Layout */
     .book-layout {
         display: grid;
-        grid-template-columns: 220px 200px 1fr;
+        grid-template-columns: 220px 180px 1fr;
         gap: 2rem;
         margin-bottom: 3rem;
     }
@@ -266,11 +214,38 @@
         color: #9ca3af;
     }
 
+    /* Download Section */
+    .download-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .btn-download {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: background 0.2s;
+    }
+
+    .btn-download:hover {
+        background: #2563eb;
+        color: white;
+    }
+
     /* Meta Column */
     .book-meta-column {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.25rem;
     }
 
     .meta-item {
@@ -292,106 +267,31 @@
         font-weight: 500;
     }
 
-    /* Accordions Column */
-    .book-accordions-column {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
+    /* Description Column */
+    .book-description-column {
+        min-width: 0;
     }
 
-    .accordion {
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .accordion:first-child {
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .accordion-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #111827;
-        cursor: pointer;
-        list-style: none;
-    }
-
-    .accordion-header::-webkit-details-marker {
-        display: none;
-    }
-
-    .accordion-icon {
-        transition: transform 0.2s ease;
-    }
-
-    .accordion[open] .accordion-icon {
-        transform: rotate(180deg);
-    }
-
-    .accordion-content {
-        padding: 0 0 1.5rem 0;
+    .book-description {
         color: #4b5563;
-        line-height: 1.7;
+        line-height: 1.8;
         font-size: 0.95rem;
     }
 
-    .accordion-content p {
+    .book-description p {
         margin-bottom: 1rem;
     }
 
-    .accordion-content p:last-child {
+    .book-description p:last-child {
         margin-bottom: 0;
     }
 
-    /* Details Grid */
-    .details-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
+    .book-description a {
+        color: #3b82f6;
     }
 
-    .detail-item {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .detail-label {
-        color: #6b7280;
-        min-width: 100px;
-    }
-
-    .detail-value {
-        color: #111827;
-    }
-
-    /* Download Section */
-    .download-section {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-    }
-
-    .btn-download {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        background: #3b82f6;
-        color: white;
-        padding: 0.875rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
-    }
-
-    .btn-download:hover {
-        background: #2563eb;
-        color: white;
+    .book-description a:hover {
+        text-decoration: underline;
     }
 
     /* Related Section */
@@ -445,7 +345,7 @@
             gap: 1.5rem;
         }
 
-        .book-accordions-column {
+        .book-description-column {
             grid-column: 1 / -1;
         }
 

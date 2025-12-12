@@ -24,17 +24,109 @@
 
         {{-- Main Content --}}
         <main class="catalog-content">
-            <h1 class="catalog-title">Книги</h1>
+            <div class="catalog-header">
+                <h1 class="catalog-title">Книги</h1>
+
+                {{-- View Switcher --}}
+                <div class="view-switcher">
+                    <button type="button" class="view-btn active" data-view="grid-3" title="3 в ряд">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                            <rect x="0" y="0" width="5" height="5" rx="1"/>
+                            <rect x="6.5" y="0" width="5" height="5" rx="1"/>
+                            <rect x="13" y="0" width="5" height="5" rx="1"/>
+                            <rect x="0" y="6.5" width="5" height="5" rx="1"/>
+                            <rect x="6.5" y="6.5" width="5" height="5" rx="1"/>
+                            <rect x="13" y="6.5" width="5" height="5" rx="1"/>
+                            <rect x="0" y="13" width="5" height="5" rx="1"/>
+                            <rect x="6.5" y="13" width="5" height="5" rx="1"/>
+                            <rect x="13" y="13" width="5" height="5" rx="1"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="view-btn" data-view="grid-4" title="4 в ряд">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                            <rect x="0" y="0" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="4.8" y="0" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="9.6" y="0" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="14.5" y="0" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="0" y="4.8" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="4.8" y="4.8" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="9.6" y="4.8" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="14.5" y="4.8" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="0" y="9.6" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="4.8" y="9.6" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="9.6" y="9.6" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="14.5" y="9.6" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="0" y="14.5" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="4.8" y="14.5" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="9.6" y="14.5" width="3.5" height="3.5" rx="0.5"/>
+                            <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.5"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="view-btn" data-view="list" title="Список">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                            <rect x="0" y="0" width="18" height="5" rx="1"/>
+                            <rect x="0" y="6.5" width="18" height="5" rx="1"/>
+                            <rect x="0" y="13" width="18" height="5" rx="1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
             @if($books->isEmpty())
                 <div class="empty-state">
                     <p>Книги не найдены</p>
                 </div>
             @else
-                <div class="books-grid">
-                    @foreach($books as $book)
-                        @include('components.book-card-modern', ['book' => $book])
-                    @endforeach
+                <div class="books-container" id="booksContainer">
+                    {{-- Grid View --}}
+                    <div class="books-grid" id="booksGrid">
+                        @foreach($books as $book)
+                            @include('components.book-card-modern', ['book' => $book])
+                        @endforeach
+                    </div>
+
+                    {{-- List View (hidden by default) --}}
+                    <div class="books-list hidden" id="booksList">
+                        @foreach($books as $book)
+                            <article class="book-list-item">
+                                <a href="{{ route('book.show', $book->slug) }}" class="book-list-cover">
+                                    @if($book->cover_image)
+                                        <img src="{{ asset('storage/uploads/' . $book->cover_image) }}"
+                                             alt="{{ $book->cover_alt ?? $book->title }}"
+                                             loading="lazy">
+                                    @else
+                                        <div class="book-list-placeholder">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </a>
+                                <div class="book-list-info">
+                                    <a href="{{ route('book.show', $book->slug) }}" class="book-list-title">{{ $book->title }}</a>
+                                    @if($book->categories->isNotEmpty())
+                                        <div class="book-list-category">
+                                            {{ $book->categories->pluck('name')->join(', ') }}
+                                        </div>
+                                    @endif
+                                    @if($book->description_plain)
+                                        <p class="book-list-desc">{{ Str::limit($book->description_plain, 250) }}</p>
+                                    @endif
+                                    <div class="book-list-meta">
+                                        <span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            {{ number_format($book->views_count, 0, '', ' ') }}
+                                        </span>
+                                        <span>{{ $book->published_at?->format('d.m.Y') }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
                 </div>
 
                 {{-- Pagination --}}
@@ -159,19 +251,157 @@
         min-width: 0;
     }
 
+    .catalog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
     .catalog-title {
         font-size: 1.5rem;
         font-weight: 700;
         color: #111827;
-        margin-bottom: 2rem;
+        margin: 0;
     }
 
-    /* Books Grid - 3 columns */
+    /* View Switcher */
+    .view-switcher {
+        display: flex;
+        gap: 0.25rem;
+        background: #f3f4f6;
+        padding: 0.25rem;
+        border-radius: 8px;
+    }
+
+    .view-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .view-btn:hover {
+        color: #111827;
+    }
+
+    .view-btn.active {
+        background: white;
+        color: #3b82f6;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Books Grid */
     .books-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
+        gap: 1.5rem;
         margin-bottom: 3rem;
+    }
+
+    .books-grid.grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Books List */
+    .books-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .books-list.hidden {
+        display: none;
+    }
+
+    .books-grid.hidden {
+        display: none;
+    }
+
+    .book-list-item {
+        display: flex;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .book-list-cover {
+        flex-shrink: 0;
+        width: 120px;
+    }
+
+    .book-list-cover img {
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .book-list-placeholder {
+        width: 100%;
+        aspect-ratio: 2/3;
+        background: #e5e7eb;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+    }
+
+    .book-list-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .book-list-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.4;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-list-title:hover {
+        color: #3b82f6;
+    }
+
+    .book-list-category {
+        font-size: 0.85rem;
+        color: #3b82f6;
+        margin-bottom: 0.75rem;
+    }
+
+    .book-list-desc {
+        font-size: 0.9rem;
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .book-list-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.85rem;
+        color: #9ca3af;
+    }
+
+    .book-list-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 
     /* Empty State */
@@ -238,7 +468,9 @@
     @media (max-width: 1200px) {
         .books-grid {
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+        }
+        .books-grid.grid-4 {
+            grid-template-columns: repeat(3, 1fr);
         }
     }
 
@@ -249,6 +481,16 @@
         }
 
         .books-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .books-grid.grid-4 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .books-grid,
+        .books-grid.grid-4 {
             grid-template-columns: repeat(2, 1fr);
         }
     }
@@ -269,9 +511,27 @@
             margin-bottom: 0;
         }
 
-        .books-grid {
+        .books-grid,
+        .books-grid.grid-4 {
             grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
+        }
+
+        .book-list-item {
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .book-list-cover {
+            width: 80px;
+        }
+
+        .book-list-title {
+            font-size: 1rem;
+        }
+
+        .book-list-desc {
+            display: none;
         }
     }
 
@@ -281,11 +541,60 @@
             gap: 1.5rem;
         }
 
-        .books-grid {
+        .books-grid,
+        .books-grid.grid-4 {
             grid-template-columns: 1fr;
             max-width: 280px;
             margin: 0 auto 3rem;
         }
+
+        .view-switcher {
+            display: none;
+        }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-btn');
+    const booksGrid = document.getElementById('booksGrid');
+    const booksList = document.getElementById('booksList');
+
+    // Load saved view preference
+    const savedView = localStorage.getItem('booksView') || 'grid-3';
+    setView(savedView);
+
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.dataset.view;
+            setView(view);
+            localStorage.setItem('booksView', view);
+        });
+    });
+
+    function setView(view) {
+        // Update buttons
+        viewButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+
+        // Update view
+        if (view === 'list') {
+            booksGrid.classList.add('hidden');
+            booksList.classList.remove('hidden');
+        } else {
+            booksGrid.classList.remove('hidden');
+            booksList.classList.add('hidden');
+
+            if (view === 'grid-4') {
+                booksGrid.classList.add('grid-4');
+            } else {
+                booksGrid.classList.remove('grid-4');
+            }
+        }
+    }
+});
+</script>
 @endpush
