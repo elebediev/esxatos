@@ -72,6 +72,7 @@
 @endsection
 
 @push('styles')
+@include('partials.dashboard-styles')
 <style>
     .cache-actions { margin-bottom: 2rem; }
     .inline-form { display: inline; }

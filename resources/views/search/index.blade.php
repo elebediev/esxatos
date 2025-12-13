@@ -39,14 +39,16 @@
                 </div>
             @endif
         @else
-            <div class="search-tips">
-                <h2>Советы по поиску</h2>
-                <ul>
-                    <li>Введите название книги или имя автора</li>
-                    <li>Используйте ключевые слова: «библеистика», «богословие», «история церкви»</li>
-                    <li>Для модулей BibleQuote добавьте «модуль» или «BibleQuote»</li>
-                </ul>
-            </div>
+            @if($recentBooks->isNotEmpty())
+                <div class="recent-books">
+                    <h2>Недавно добавленные</h2>
+                    <div class="grid grid-4">
+                        @foreach($recentBooks as $book)
+                            @include('components.book-card', ['book' => $book])
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 @endsection
@@ -54,8 +56,12 @@
 @push('styles')
 <style>
     .search-page {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
+    }
+
+    .search-page .search-form-large {
+        max-width: 700px;
     }
 
     .search-form-large {
@@ -99,33 +105,14 @@
         color: var(--text);
     }
 
-    .search-tips {
-        background: var(--bg-card);
-        border-radius: var(--radius);
-        padding: 2rem;
+    .recent-books {
         margin-top: 2rem;
     }
 
-    .search-tips h2 {
-        font-size: 1.125rem;
-        margin-bottom: 1rem;
-    }
-
-    .search-tips ul {
-        list-style: none;
-    }
-
-    .search-tips li {
-        padding: 0.5rem 0;
-        padding-left: 1.5rem;
-        position: relative;
-    }
-
-    .search-tips li::before {
-        content: "→";
-        position: absolute;
-        left: 0;
-        color: var(--primary);
+    .recent-books h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
     }
 
     @media (max-width: 640px) {

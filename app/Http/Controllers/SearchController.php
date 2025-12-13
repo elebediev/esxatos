@@ -36,7 +36,18 @@ class SearchController extends Controller
                 ->withQueryString();
         }
 
-        return view('search.index', compact('books', 'query'));
+        // Show recent books when no query
+        $recentBooks = collect();
+        if (empty($query)) {
+            $recentBooks = Book::published()
+                ->books()
+                ->with(['categories'])
+                ->latest('created_at')
+                ->limit(8)
+                ->get();
+        }
+
+        return view('search.index', compact('books', 'query', 'recentBooks'));
     }
 
     public function autocomplete(Request $request)
