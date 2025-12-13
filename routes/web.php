@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CacheController as AdminCacheController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\PointsController as AdminPointsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AudioController;
 use App\Http\Controllers\BookController;
@@ -85,6 +86,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::patch('/users/{user}/roles', [AdminUserController::class, 'updateRoles'])->name('users.update-roles');
+    Route::post('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
 
     // Cache management
     Route::get('/cache', [AdminCacheController::class, 'index'])->name('cache.index');
@@ -99,6 +102,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
     Route::post('/categories/update-order', [AdminCategoryController::class, 'updateOrder'])->name('categories.update-order');
+
+    // Points management
+    Route::get('/points', [AdminPointsController::class, 'index'])->name('points.index');
+    Route::get('/points/transactions', [AdminPointsController::class, 'transactions'])->name('points.transactions');
+    Route::get('/points/categories', [AdminPointsController::class, 'categories'])->name('points.categories');
+    Route::patch('/points/categories/{category}', [AdminPointsController::class, 'updateCategory'])->name('points.categories.update');
+    Route::get('/points/user/{user}', [AdminPointsController::class, 'userHistory'])->name('points.user-history');
+    Route::get('/points/user/{user}/add', [AdminPointsController::class, 'createTransaction'])->name('points.create-transaction');
+    Route::post('/points/user/{user}', [AdminPointsController::class, 'storeTransaction'])->name('points.store-transaction');
+    Route::post('/points/transactions/{transaction}/cancel', [AdminPointsController::class, 'cancelTransaction'])->name('points.cancel-transaction');
+    Route::get('/points/transactions/{transaction}/edit', [AdminPointsController::class, 'editTransaction'])->name('points.edit-transaction');
+    Route::put('/points/transactions/{transaction}', [AdminPointsController::class, 'updateTransaction'])->name('points.update-transaction');
 });
 
 require __DIR__.'/auth.php';

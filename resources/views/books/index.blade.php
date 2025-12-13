@@ -62,6 +62,35 @@
                             <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.5"/>
                         </svg>
                     </button>
+                    <button type="button" class="view-btn" data-view="grid-5" title="5 в ряд">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                            <rect x="0" y="0" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="3.8" y="0" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="7.6" y="0" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="11.4" y="0" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="15.2" y="0" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="0" y="3.8" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="3.8" y="3.8" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="7.6" y="3.8" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="11.4" y="3.8" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="15.2" y="3.8" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="0" y="7.6" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="3.8" y="7.6" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="7.6" y="7.6" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="11.4" y="7.6" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="15.2" y="7.6" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="0" y="11.4" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="3.8" y="11.4" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="7.6" y="11.4" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="11.4" y="11.4" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="15.2" y="11.4" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="0" y="15.2" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="3.8" y="15.2" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="7.6" y="15.2" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="11.4" y="15.2" width="2.8" height="2.8" rx="0.4"/>
+                            <rect x="15.2" y="15.2" width="2.8" height="2.8" rx="0.4"/>
+                        </svg>
+                    </button>
                     <button type="button" class="view-btn" data-view="list" title="Список">
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
                             <rect x="0" y="0" width="18" height="5" rx="1"/>
@@ -199,6 +228,7 @@
     .view-btn.active { background: var(--bg-card); color: var(--primary); box-shadow: 0 1px 3px var(--shadow); }
     .books-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
     .books-grid.grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .books-grid.grid-5 { grid-template-columns: repeat(5, 1fr); gap: 1rem; }
     .books-list { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; }
     .books-list.hidden, .books-grid.hidden { display: none; }
     .book-list-item { display: flex; gap: 1.5rem; padding: 1.5rem; background: var(--bg-card); border-radius: 12px; box-shadow: 0 1px 3px var(--shadow); }
@@ -220,10 +250,10 @@
     .pagination-link.active { background: var(--primary); border-color: var(--primary); color: white; }
     .pagination-link.disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.5; }
     .pagination-ellipsis { color: var(--text-muted); padding: 0 0.5rem; }
-    @media (max-width: 1024px) { .catalog-page { grid-template-columns: 180px 1fr; gap: 2rem; } .books-grid, .books-grid.grid-4 { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) { .books-grid, .books-grid.grid-4 { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) { .catalog-page { grid-template-columns: 1fr; } .catalog-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; } .sidebar-section { margin-bottom: 0; } .books-grid, .books-grid.grid-4 { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; } .book-list-item { padding: 1rem; gap: 1rem; } .book-list-cover { width: 80px; } .book-list-title { font-size: 1rem; } .book-list-desc { display: none; } }
-    @media (max-width: 480px) { .catalog-sidebar { grid-template-columns: 1fr; gap: 1.5rem; } .books-grid, .books-grid.grid-4 { grid-template-columns: 1fr; max-width: 280px; margin: 0 auto 3rem; } .view-switcher { display: none; } }
+    @media (max-width: 1024px) { .catalog-page { grid-template-columns: 180px 1fr; gap: 2rem; } .books-grid, .books-grid.grid-4, .books-grid.grid-5 { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) { .books-grid, .books-grid.grid-4, .books-grid.grid-5 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .catalog-page { grid-template-columns: 1fr; } .catalog-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; } .sidebar-section { margin-bottom: 0; } .books-grid, .books-grid.grid-4, .books-grid.grid-5 { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; } .book-list-item { padding: 1rem; gap: 1rem; } .book-list-cover { width: 80px; } .book-list-title { font-size: 1rem; } .book-list-desc { display: none; } }
+    @media (max-width: 480px) { .catalog-sidebar { grid-template-columns: 1fr; gap: 1.5rem; } .books-grid, .books-grid.grid-4, .books-grid.grid-5 { grid-template-columns: 1fr; max-width: 280px; margin: 0 auto 3rem; } .view-switcher { display: none; } }
 </style>
 @endpush
 
@@ -259,11 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             booksGrid.classList.remove('hidden');
             booksList.classList.add('hidden');
+            booksGrid.classList.remove('grid-4', 'grid-5');
 
             if (view === 'grid-4') {
                 booksGrid.classList.add('grid-4');
-            } else {
-                booksGrid.classList.remove('grid-4');
+            } else if (view === 'grid-5') {
+                booksGrid.classList.add('grid-5');
             }
         }
     }

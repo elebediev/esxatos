@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MessageThread;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -38,7 +39,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load('roles');
+        $user->load(['roles', 'pointBalances.category']);
 
         // Get user's message threads count
         $messageThreadsCount = MessageThread::whereHas('participants', fn($q) => $q->where('user_id', $user->id))->count();
@@ -49,6 +50,36 @@ class UserController extends Controller
         // Get recent login logs
         $loginLogs = $user->loginLogs()->limit(20)->get();
 
-        return view('admin.users.show', compact('user', 'messageThreadsCount', 'booksCount', 'loginLogs'));
+        // Get all available roles
+        $allRoles = Role::orderBy('name')->pluck('name');
+
+        return view('admin.users.show', compact('user', 'messageThreadsCount', 'booksCount', 'loginLogs', 'allRoles'));
+    }
+
+    public function updateRoles(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'roles' => 'array',
+            'roles.*' => 'string|exists:roles,name',
+        ]);
+
+        $user->syncRoles($validated['roles'] ?? []);
+
+        return back()->with('success', 'Роли пользователя обновлены');
+    }
+
+    public function toggleStatus(User $user)
+    {
+        // Prevent deactivating yourself
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Вы не можете деактивировать свой аккаунт');
+        }
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $status = $user->is_active ? 'активирован' : 'деактивирован';
+
+        return back()->with('success', "Аккаунт пользователя {$status}");
     }
 }

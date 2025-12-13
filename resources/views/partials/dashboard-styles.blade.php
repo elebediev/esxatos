@@ -6,6 +6,7 @@
     .dashboard-nav-link:hover { background: var(--bg-secondary); color: var(--text-main); }
     .dashboard-nav-link.active { background: var(--primary); color: white; }
     .nav-badge { background: #ef4444; color: white; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; margin-left: auto; }
+    .nav-section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 1rem 1rem 0.5rem; margin-top: 0.5rem; border-top: 1px solid var(--border); }
     .dashboard-nav-link.logout { width: 100%; border: none; background: none; cursor: pointer; text-align: left; font-size: 1rem; font-family: inherit; }
     .dashboard-nav-link.logout:hover { background: #fee2e2; color: #dc2626; }
     .dashboard-nav-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }

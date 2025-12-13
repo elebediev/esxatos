@@ -8,13 +8,21 @@
 
     <div class="dashboard-content">
         <div class="page-header">
-            <a href="{{ route('admin.users.index') }}" class="back-link">
+            <div class="page-header-left">
+                <a href="{{ route('admin.users.index') }}" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Назад к списку
+                </a>
+                <h1 class="dashboard-title">{{ $user->name }}</h1>
+            </div>
+            <a href="{{ route('messages.create', ['to' => $user->id]) }}" class="action-btn action-btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                Назад к списку
+                Написать сообщение
             </a>
-            <h1 class="dashboard-title">{{ $user->name }}</h1>
         </div>
 
         <div class="user-detail-grid">
@@ -41,6 +49,14 @@
                     <div class="info-item">
                         <span class="info-label">Фамилия</span>
                         <span class="info-value">{{ $user->last_name ?? '—' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Страна</span>
+                        <span class="info-value">{{ $user->country ?? '—' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Населенный пункт</span>
+                        <span class="info-value">{{ $user->city ?? '—' }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Email</span>
@@ -71,6 +87,99 @@
                 </div>
             </div>
 
+            {{-- Roles & Account Management Card --}}
+            <div class="detail-card">
+                <h2 class="card-title">Управление аккаунтом</h2>
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-error">{{ session('error') }}</div>
+                @endif
+
+                <h3 class="card-subtitle">Роли</h3>
+                <form action="{{ route('admin.users.update-roles', $user) }}" method="POST" class="roles-form">
+                    @csrf
+                    @method('PATCH')
+                    <div class="roles-checkboxes">
+                        @foreach($allRoles as $role)
+                            <label class="role-checkbox">
+                                <input type="checkbox" name="roles[]" value="{{ $role }}"
+                                    {{ $user->hasRole($role) ? 'checked' : '' }}>
+                                <span class="role-checkbox-label role-{{ $role }}">{{ $role }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <button type="submit" class="action-btn action-btn-primary" style="margin-top: 1rem;">
+                        Сохранить роли
+                    </button>
+                </form>
+
+                <div class="status-section">
+                    <h3 class="card-subtitle">Статус аккаунта</h3>
+                    @if($user->id !== auth()->id())
+                        <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="status-form">
+                            @csrf
+                            @if($user->is_active)
+                                <p class="status-info">Аккаунт активен. Деактивированный пользователь не сможет войти в систему.</p>
+                                <button type="submit" class="action-btn action-btn-danger" onclick="return confirm('Вы уверены, что хотите деактивировать этот аккаунт?')">
+                                    Деактивировать аккаунт
+                                </button>
+                            @else
+                                <p class="status-info status-warning">Аккаунт деактивирован. Пользователь не может войти в систему.</p>
+                                <button type="submit" class="action-btn action-btn-success">
+                                    Активировать аккаунт
+                                </button>
+                            @endif
+                        </form>
+                    @else
+                        <p class="status-info">Вы не можете изменить статус своего аккаунта.</p>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Points Card --}}
+            <div class="detail-card">
+                <h2 class="card-title">Баланс баллов</h2>
+                <div class="points-info">
+                    <div class="points-total">
+                        <span class="points-value {{ $user->total_points >= 0 ? 'positive' : 'negative' }}">
+                            {{ number_format($user->total_points, 0, '.', ' ') }}
+                        </span>
+                        <span class="points-label">общий баланс</span>
+                    </div>
+                    @if($user->pointBalances->count() > 0)
+                        <div class="points-breakdown">
+                            @foreach($user->pointBalances as $balance)
+                                <div class="balance-row">
+                                    <span class="category-name">{{ $balance->category?->name ?? 'Без категории' }}</span>
+                                    <span class="category-points">{{ number_format($balance->points, 0, '.', ' ') }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+                <div class="points-actions">
+                    <a href="{{ route('admin.points.user-history', $user) }}" class="action-btn-small">История</a>
+                    <a href="{{ route('admin.points.create-transaction', $user) }}" class="action-btn-small primary">+ Начислить</a>
+                </div>
+            </div>
+
+            {{-- Stats Card --}}
+            <div class="detail-card">
+                <h2 class="card-title">Статистика</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ $booksCount }}</span>
+                        <span class="stat-label">Загруженных книг</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ $messageThreadsCount }}</span>
+                        <span class="stat-label">Переписок</span>
+                    </div>
+                </div>
+            </div>
+
             {{-- Activity Card --}}
             <div class="detail-card">
                 <h2 class="card-title">Активность</h2>
@@ -90,21 +199,6 @@
                     <div class="info-item">
                         <span class="info-label">Последнее обновление</span>
                         <span class="info-value">{{ $user->updated_at?->format('d.m.Y H:i') ?? '—' }}</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Stats Card --}}
-            <div class="detail-card">
-                <h2 class="card-title">Статистика</h2>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-value">{{ $booksCount }}</span>
-                        <span class="stat-label">Загруженных книг</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">{{ $messageThreadsCount }}</span>
-                        <span class="stat-label">Переписок</span>
                     </div>
                 </div>
             </div>
@@ -171,15 +265,6 @@
             @endif
         </div>
 
-        {{-- Actions --}}
-        <div class="user-actions">
-            <a href="{{ route('messages.create', ['to' => $user->id]) }}" class="action-btn action-btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                Написать сообщение
-            </a>
-        </div>
     </div>
 </div>
 @endsection
@@ -187,7 +272,14 @@
 @push('styles')
 @include('partials.dashboard-styles')
 <style>
-    .page-header { margin-bottom: 2rem; }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+    .page-header-left { flex: 1; }
     .back-link {
         display: inline-flex;
         align-items: center;
@@ -309,13 +401,91 @@
 
     .text-muted { color: var(--text-muted); }
 
-    .user-actions {
-        margin-top: 2rem;
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .card-subtitle {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin: 0 0 0.75rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-section {
+        margin-top: 1.5rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--border);
-        display: flex;
-        gap: 1rem;
     }
+    .status-info {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0 0 1rem 0;
+    }
+    .status-info.status-warning {
+        color: #dc2626;
+        font-weight: 500;
+    }
+
+    .action-btn-danger {
+        background: #dc2626;
+        color: white;
+    }
+    .action-btn-danger:hover {
+        background: #b91c1c;
+        color: white;
+    }
+    .action-btn-success {
+        background: #059669;
+        color: white;
+    }
+    .action-btn-success:hover {
+        background: #047857;
+        color: white;
+    }
+
+    .roles-form { }
+    .roles-checkboxes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .role-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .role-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    .role-checkbox-label {
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .role-checkbox-label.role-admin { background: #fef3c7; color: #92400e; }
+    .role-checkbox-label.role-club { background: #dbeafe; color: #1e40af; }
+    .role-checkbox-label.role-aide { background: #d1fae5; color: #065f46; }
 
     .action-btn {
         display: inline-flex;
@@ -328,6 +498,7 @@
         transition: all 0.2s;
         border: none;
         cursor: pointer;
+        text-decoration: none;
     }
 
     .action-btn-primary {
@@ -347,6 +518,7 @@
 
     .detail-card-full {
         grid-column: 1 / -1;
+        margin-top: 1.5rem;
     }
 
     .login-logs-table {
@@ -406,6 +578,66 @@
         text-align: center;
         padding: 2rem;
     }
+
+    /* Points Card Styles */
+    .points-info {
+        margin-bottom: 1rem;
+    }
+    .points-total {
+        text-align: center;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .points-total .points-value {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+    }
+    .points-total .points-value.positive { color: #059669; }
+    .points-total .points-value.negative { color: #dc2626; }
+    .points-total .points-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+    }
+    .points-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .balance-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+    }
+    .category-name { color: var(--text-secondary); }
+    .category-points { font-weight: 600; color: var(--text-main); white-space: nowrap; }
+    .points-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+    .action-btn-small {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        text-align: center;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        background: var(--bg-secondary);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+    }
+    .action-btn-small:hover { background: var(--bg-card); border-color: var(--primary); }
+    .action-btn-small.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .action-btn-small.primary:hover { background: var(--primary-dark, #5b4dc4); }
 
     @media (max-width: 768px) {
         .info-item {

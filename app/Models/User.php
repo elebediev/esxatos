@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -18,6 +19,8 @@ class User extends Authenticatable
         'name',
         'first_name',
         'last_name',
+        'country',
+        'city',
         'email',
         'password',
         'drupal_password_hash',
@@ -25,6 +28,7 @@ class User extends Authenticatable
         'timezone',
         'language',
         'last_login_at',
+        'total_points',
     ];
 
     protected $hidden = [
@@ -40,6 +44,7 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'total_points' => 'integer',
         ];
     }
 
@@ -51,6 +56,61 @@ class User extends Authenticatable
     public function loginLogs(): HasMany
     {
         return $this->hasMany(UserLoginLog::class)->orderBy('logged_in_at', 'desc');
+    }
+
+    public function pointBalances(): HasMany
+    {
+        return $this->hasMany(UserPoint::class);
+    }
+
+    public function pointTransactions(): HasMany
+    {
+        return $this->hasMany(UserPointTransaction::class)->orderBy('created_at', 'desc');
+    }
+
+    public function approvedTransactions(): HasMany
+    {
+        return $this->hasMany(UserPointTransaction::class, 'approver_id');
+    }
+
+    /**
+     * Get points balance for a specific category
+     */
+    public function getPointsForCategory(?int $categoryId): int
+    {
+        $userPoint = $this->pointBalances()->where('category_id', $categoryId)->first();
+        return $userPoint?->points ?? 0;
+    }
+
+    /**
+     * Check if user has enough points
+     */
+    public function hasPoints(int $amount): bool
+    {
+        return $this->total_points >= $amount;
+    }
+
+    /**
+     * Check if user has any active subscription (golden points)
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->pointTransactions()
+            ->where('status', UserPointTransaction::STATUS_APPROVED)
+            ->where('is_expired', false)
+            ->where('points', '>', 0)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
+    /**
+     * Recalculate total points from all categories
+     */
+    public function recalculateTotalPoints(): void
+    {
+        $this->total_points = $this->pointBalances()->sum('points');
+        $this->save();
     }
 
     /**

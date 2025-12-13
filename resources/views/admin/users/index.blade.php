@@ -48,7 +48,6 @@
                         <th>Имя</th>
                         <th>Email</th>
                         <th>Роли</th>
-                        <th>Статус</th>
                         <th>Регистрация</th>
                         <th>Последний вход</th>
                     </tr>
@@ -58,12 +57,7 @@
                     <tr>
                         <td>{{ $user->id }}</td>
                         <td>
-                            <div class="user-name">
-                                <a href="{{ route('admin.users.show', $user) }}" class="user-name-link">{{ $user->name }}</a>
-                                @if($user->drupal_uid)
-                                    <span class="drupal-badge" title="Drupal UID: {{ $user->drupal_uid }}">D</span>
-                                @endif
-                            </div>
+                            <a href="{{ route('admin.users.show', $user) }}" class="user-name-link">{{ $user->name }}</a>
                         </td>
                         <td>{{ $user->email }}</td>
                         <td>
@@ -71,19 +65,12 @@
                                 <span class="role-badge role-{{ $role->name }}">{{ $role->name }}</span>
                             @endforeach
                         </td>
-                        <td>
-                            @if($user->is_active)
-                                <span class="status-badge status-active">Активен</span>
-                            @else
-                                <span class="status-badge status-blocked">Заблокирован</span>
-                            @endif
-                        </td>
                         <td>{{ $user->created_at?->format('d.m.Y') }}</td>
                         <td>{{ $user->last_login_at?->format('d.m.Y H:i') ?? '—' }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="empty-message">Пользователи не найдены</td>
+                        <td colspan="6" class="empty-message">Пользователи не найдены</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -231,21 +218,8 @@
         background: var(--bg-secondary);
     }
 
-    .user-name { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
-    .user-name-link { color: var(--text-main); transition: color 0.2s; }
+    .user-name-link { color: var(--text-main); font-weight: 500; transition: color 0.2s; }
     .user-name-link:hover { color: var(--primary); }
-    .drupal-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 18px;
-        height: 18px;
-        background: #3b82f6;
-        color: white;
-        font-size: 0.625rem;
-        font-weight: 700;
-        border-radius: 4px;
-    }
 
     .role-badge {
         display: inline-block;
