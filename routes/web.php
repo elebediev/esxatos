@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CacheController as AdminCacheController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AudioController;
 use App\Http\Controllers\BookController;
@@ -89,6 +90,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/cache', [AdminCacheController::class, 'index'])->name('cache.index');
     Route::post('/cache/clear/{key}', [AdminCacheController::class, 'clear'])->name('cache.clear');
     Route::post('/cache/clear-all', [AdminCacheController::class, 'clearAll'])->name('cache.clear-all');
+
+    // Categories management
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/update-order', [AdminCategoryController::class, 'updateOrder'])->name('categories.update-order');
 });
 
 require __DIR__.'/auth.php';

@@ -31,8 +31,8 @@
     .book-card-modern .book-card-cover { aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px var(--shadow); margin-bottom: 1rem; background: var(--border); }
     .book-card-modern .book-card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .book-card-modern .book-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-    .book-card-modern .book-card-info { text-align: center; flex: 1; }
+    .book-card-modern .book-card-info { text-align: center; flex: 1; padding-bottom: 1.5rem; }
     .book-card-modern .book-card-author { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
-    .book-card-modern .book-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text-main); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .book-card-modern .book-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text-main); line-height: 1.4; }
     .book-card-modern .book-card-link:hover .book-card-title { color: var(--primary); }
 </style>
